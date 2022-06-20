@@ -1,0 +1,245 @@
+---
+title: "MyWater Dashboard"
+author: "Go Green and Drink Clean"
+output: html_document
+runtime: shiny
+---
+
+#  {.tabset}
+
+## **Data** {.tabset}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+if (!require("pacman")){
+install.packages("pacman")
+}
+pacman::p_load(DT,dplyr,ggplot2,tmap,scales,leaflet,shiny)
+
+source("Water.R")
+```
+
+```{r echo=FALSE}
+selectInput("MyStates","Choose one or more State", choices = sort(unique(Water$State)), multiple = TRUE, selected = "KERALA")
+```
+
+```{r echo=FALSE}
+mydata= reactive({
+filter(Water, State%in% input$MyStates)
+})
+```
+
+```{r echo=FALSE}
+
+renderDT({
+datatable(mydata(), filter = "top")
+
+})
+```
+
+## **Plots** {.tabset}
+
+### **States** {.tabset}
+
+#### **pH** {.tabset}
+
+```{r histo, fig.width = 3, fig.height = 2}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x = State, y = pH , fill = State))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+
+```
+
+According to EPA regulation, pH level should be within the range of **6.5 to 8.5** for safe consumption!
+
+#### **Dissolved Oxygen** {.tabset}
+
+```{r histo1, fig.width = 3,fig.height = 2}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = Dissolved.Oxygen , fill= State))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+Dissolved Oxygen level should be within the range of **65 - 85 mg/L** for safe consumption!
+
+#### **Conductivity** {.tabset}
+
+```{r histo2, fig.width = 10, fig.height = 2}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = Conductivity , fill= State))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+The limit for drinking water conductivity is **2500 micro-Siemens per centimetre (µS/cm)**
+
+#### **BOD** {.tabset}
+
+```{r histo3, fig.width = 3,fig.height = 2}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = BOD , fill= State))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+Acceptable drinking water should have a BOD of around **20 - 40 mg/l**
+
+#### **Nitrate** {.tabset}
+
+```{r histo4, fig.width = 3,fig.height = 2}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = Nitrate , fill= State))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+Drinking water with levels of nitrate at or below 25 mg/L is considered safe for everyone.
+
+#### **Fecal Coliform** {.tabset}
+
+```{r histo5, fig.width = 3,fig.height = 2}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = Fecal.Coliform , fill= State))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+The presence of fecal coliform in a drinking water sample **often indicates recent fecal contamination**, meaning that there is a greater risk that pathogens are present than if only total coliform bacteria is detected
+
+### **Locations** {.tabset}
+
+#### **pH** {.tabset}
+
+```{r histo6, fig.width = 3,fig.height = 2}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x = State, y = pH , fill = Locations))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+
+```
+
+According to EPA regulation, pH level should be within the range of **6.5 to 8.5** for safe consumption!
+
+#### **Dissolved Oxygen** {.tabset}
+
+```{r histo7, fig.width = 10 ,fig.height = 5}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = Dissolved.Oxygen , fill= Locations))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+Dissolved Oxygen level should be within the range of **65 - 85 mg/L** for safe consumption!
+
+#### **Conductivity** {.tabset}
+
+```{r histo8, fig.width = 10, fig.height = 5}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = Conductivity , fill= Locations))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+The limit for drinking water conductivity is **2500 micro-Siemens per centimetre (µS/cm)**
+
+#### **BOD** {.tabset}
+
+```{r histo9, fig.width = 10 ,fig.height = 5}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = BOD , fill= Locations))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+Acceptable drinking water should have a BOD of around **20 - 40 mg/l**
+
+#### **Nitrate** {.tabset}
+
+```{r histo10, fig.width = 10 ,fig.height = 5}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = Nitrate , fill= Locations))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+Drinking water with levels of nitrate at or below 25 mg/L is considered safe for everyone.
+
+#### **Fecal Coliform** {.tabset}
+
+```{r histo11, fig.width = 10 ,fig.height = 5}
+
+renderPlot({
+ggplot2::ggplot(mydata(),aes(x=State, y = Fecal.Coliform , fill= Locations))+
+geom_bar(stat="identity")+
+theme_minimal()
+
+})
+```
+
+The presence of fecal coliform in a drinking water sample **often indicates recent fecal contamination**, meaning that there is a greater risk that pathogens are present than if only total coliform bacteria is detected
+
+## **User Guide** {.tabset}
+
+**Welcome to MyWater Dashboard!**
+
+Here we will explore how you can navigate this app. At the top you will find three tabs which are Data, Plot and User Guide.
+
+Below data tab in the selection box given you will choose the state(s) you are interested in. After you chose the state, lets say Goa the table will show only Goa state and this is because our MyWater app is dynamic and reactive. You have the option to select more than one state and the table will display data for the state(s) you have selected.
+
+
+```{r}
+knitr::include_graphics("Picture1.png" , error = FALSE)
+```
+
+
+
+Next show entries box allows you to select from a drop down list, the number of records you would like to see per page. Besides, is the search box which allows to search names for any states and locations you would like to find. Note that before you choose to search a state or location in the search box make sure you have selected it in advanced in the selection box at top of the page.
+
+![](Images/Picture2.png)
+
+Below all the variables in table displayed, except for the state column are blank boxes which allow you to specify the range of any variable and the table will display the state (s) and locations which will possess those ranges you choose for each attributed you changed.
+
+In the plot tab you will find many sub tabs which help you see graphical visualization for various parameters in states and locations selected in the data tab!
+
+![](Images/Picture3.png) 
+
+![](Images/Picture4.png)
+
+Finally the user guide tab is the last tab and helps you learn how to utilize this app!
+
+**Now you can try it too!! Happy Trying**
